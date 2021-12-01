@@ -116,7 +116,7 @@ echo '#!/bin/bash' > "$tester"
 echo "$prog $codefile" '$@' >> "$tester"
 chmod +x "$tester"
 
-code "$dir/$codefile" # start editing
+subl "$dir/$codefile" # start editing
 
 fi
 
