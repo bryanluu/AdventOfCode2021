@@ -8,7 +8,9 @@ then
 
 year=$(date +%Y)
 month=`date +%m`
-if ([ $year == $advent_year ] && [ $month != 12 ])\
+hour=`date +%H`
+if ([ $year == $advent_year ] && [ $month != 12 ]\
+   && ( [ $month != 11 ] || [ $hour -lt 21 ] ) )\
    || [ $(($year < $advent_year)) == 1 ] # Too early
 then
 echo "Advent of Code $advent_year hasn't started yet!"
