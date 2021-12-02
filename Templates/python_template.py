@@ -1,6 +1,6 @@
 #!/bin/python3
 import sys
-filename = sys.argv[1] if len(sys.argv) > 1 else "input"
+filename = sys.argv[1] if len(sys.argv) > 1 else "input.txt"
 
 def solve(filename):
   pass # DO STUFF

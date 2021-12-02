@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 # frozen_string_literal: true
 
-filename = (ARGV.empty? ? 'input' : ARGV.first)
+filename = (ARGV.empty? ? 'input.txt' : ARGV.first)
 
 def solve(filename)
   # SOLVE
