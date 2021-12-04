@@ -14,19 +14,23 @@ function solve (filename) {
 
     const drawn = lines[0].split(',')
     const boards = populateBoards(lines.slice(2))
-    let score = 0
+    let firstScore = 0
+    let lastScore = 0
 
     for(let i = 0; i < drawn.length; i++) {
       const num = drawn[i]
       markNumber(num, boards)
-      winner = bingo(boards)
-      if (!ld.isEmpty(winner)) {
-        score = sumUnmarked(winner) * parseInt(num)
-        break
+      winners = bingo(boards)
+      if (winners.length > 0) {
+        if(firstScore === 0) {
+          firstScore = sumUnmarked(winners[0]) * parseInt(num)
+        }
+        lastScore = sumUnmarked(winners.at(-1)) * parseInt(num)
       }
     }
 
-    console.log(`Part 1: ${score}`)
+    console.log(`Part 1: ${firstScore}`)
+    console.log(`Part 2: ${lastScore}`)
   })
 }
 
@@ -38,7 +42,10 @@ function populateBoards(lines) {
   let row = 0
   for(let i = 0; i < lines.length; i++) {
     if (spacer.test(lines[i])) {
-      if (board.length > 0) boards.push(board)
+      if (board.length > 0) {
+        board[0][0].won = false
+        boards.push(board)
+      }
       board = []
       row = 0
       continue
@@ -58,6 +65,8 @@ function populateBoards(lines) {
 
 function markNumber(number, boards) {
   for(let i = 0; i < boards.length; i++) {
+    if (boards[i][0][0].won) continue
+
     for(let row = 0; row < 5; row++) {
       for(let col = 0; col < 5; col++) {
         if (boards[i][row][col].tile === number) boards[i][row][col].hit = true
@@ -67,20 +76,33 @@ function markNumber(number, boards) {
 }
 
 function bingo(boards) {
+  const winners = []
   for(let i = 0; i < boards.length; i++) {
     const board = boards[i]
+    if (board[0][0].won) continue
+
     const colHit = [true, true, true, true, true]
     for(let row = 0; row < 5; row++) {
       let rowHit = true
       for(let col = 0; col < 5; col++) {
-        rowHit = rowHit && board[row][col].hit
-        colHit[col] = colHit[col] && board[row][col].hit
+        let hit = board[row][col].hit
+        rowHit = rowHit && hit
+        colHit[col] = colHit[col] && hit
       }
-      if (rowHit) return board
+      if (rowHit) {
+        board[0][0].won = true
+        break
+      }
     }
-    if (colHit.some(hit => hit)) return board
+    if (colHit.some(hit => hit)) {
+      board[0][0].won = true
+    }
+    if (board[0][0].won) {
+      winners.push(board)
+    }
   }
-  return null
+
+  return winners
 }
 
 function sumUnmarked(board) {
