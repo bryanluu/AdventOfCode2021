@@ -14,13 +14,26 @@ function solve (filename) {
 
     const drawn = lines[0].split(',')
     const boards = populateBoards(lines.slice(2))
+    let score = 0
+
+    for(let i = 0; i < drawn.length; i++) {
+      const num = drawn[i]
+      markNumber(num, boards)
+      winner = bingo(boards)
+      if (!ld.isEmpty(winner)) {
+        score = sumUnmarked(winner) * parseInt(num)
+        break
+      }
+    }
+
+    console.log(`Part 1: ${score}`)
   })
 }
 
 function populateBoards(lines) {
   const boards = []
 
-  const spacer = /^\w*$/
+  const spacer = /^ *$/
   let board = []
   let row = 0
   for(let i = 0; i < lines.length; i++) {
@@ -41,6 +54,43 @@ function populateBoards(lines) {
   }
 
   return boards
+}
+
+function markNumber(number, boards) {
+  for(let i = 0; i < boards.length; i++) {
+    for(let row = 0; row < 5; row++) {
+      for(let col = 0; col < 5; col++) {
+        if (boards[i][row][col].tile === number) boards[i][row][col].hit = true
+      }
+    }
+  }
+}
+
+function bingo(boards) {
+  for(let i = 0; i < boards.length; i++) {
+    const board = boards[i]
+    const colHit = [true, true, true, true, true]
+    for(let row = 0; row < 5; row++) {
+      let rowHit = true
+      for(let col = 0; col < 5; col++) {
+        rowHit = rowHit && board[row][col].hit
+        colHit[col] = colHit[col] && board[row][col].hit
+      }
+      if (rowHit) return board
+    }
+    if (colHit.some(hit => hit)) return board
+  }
+  return null
+}
+
+function sumUnmarked(board) {
+  let sum = 0
+  for(let row = 0; row < 5; row++) {
+    for(let col = 0; col < 5; col++) {
+      if (!board[row][col].hit) sum += parseInt(board[row][col].tile)
+    }
+  }
+  return sum
 }
 
 // run if script is run
