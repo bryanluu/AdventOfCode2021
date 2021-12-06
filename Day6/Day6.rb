@@ -6,20 +6,28 @@ filename = (ARGV.empty? ? 'input.txt' : ARGV.first)
 def solve(filename)
   lines = File.readlines(filename).map(&:chomp)
 
-  fish = lines.first.split(',').map(&:to_i)
+  starting_fish = lines.first.split(',').map(&:to_i)
 
-  80.times do |day|
-    (0...fish.length).each do |i|
-      if fish[i].zero?
-        fish.push(8) if fish[i].zero?
-        fish[i] = 6
-      else
-        fish[i] -= 1
-      end
-    end
+  fish = Hash.new(0)
+  starting_fish.each do |f|
+    fish[f] += 1
   end
 
-  puts "Part 1: #{fish.length}"
+  n_days = 256
+
+  (1..n_days).each do |day|
+    lives = fish.keys.sort
+    lives.each do |days_left|
+      fish[days_left - 1] = fish.delete(days_left)
+    end
+    fish[6] += fish[-1]
+    fish[8] = fish[-1]
+    fish.delete(-1)
+
+    puts "Part 1: #{fish.values.sum}" if day == 80
+  end
+
+  puts "Part 2: #{fish.values.sum}"
 end
 
 if __FILE__ == $PROGRAM_NAME
