@@ -10,6 +10,7 @@ def solve(filename):
     digit_map = { 2: 1, 4: 4, 3: 7, 7: 8 }
 
     count = 0
+    output_sum = 0
     for line in lines:
       # sort each code alphabetically before processing
       input_values, output_values = map(lambda x: list(map(lambda y: "".join(sorted(y)), x.strip().split())), line.split('|'))
@@ -25,18 +26,19 @@ def solve(filename):
 
       decoding = decode_digits(segment_map)
 
-      print(f"'{' '.join(output_values)}' = {decode_codes(output_values, decoding)}")
-
       for code in output_values:
         if len(code) in digit_map:
           count += 1
 
+      output_sum += decode_codes(output_values, decoding)
+
     print(f"Part 1: {count}")
+    print(f"Part 2: {output_sum}")
 
 def decode_digits(segment_map):
   decoding = { code: digit for digit, code in segment_map.items() if digit != 'leftovers' }
   segments = { digit: set(segment_map[digit]) for digit in segment_map.keys() }
-  # decode each digit
+  # decode each remaining digit
   for code in segment_map['leftovers']:
     if len(code) == 6:
       if not segments[1] <= set(code):
@@ -63,7 +65,7 @@ def decode_digit(digit, code, decoding):
   decoding[code] = digit
 
 def decode_codes(codes, decoding):
-  return "".join([str(decoding[code]) for code in codes])
+  return int("".join([str(decoding[code]) for code in codes]))
 
 if __name__ == '__main__':
   print(f"Input file: {filename}")
