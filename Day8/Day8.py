@@ -25,7 +25,7 @@ def solve(filename):
 
       decoding = decode_digits(segment_map)
 
-      print(f"{input_values}: {decoding}")
+      print(f"'{' '.join(output_values)}' = {decode_codes(output_values, decoding)}")
 
       for code in output_values:
         if len(code) in digit_map:
@@ -61,6 +61,9 @@ def decode_digits(segment_map):
 
 def decode_digit(digit, code, decoding):
   decoding[code] = digit
+
+def decode_codes(codes, decoding):
+  return "".join([str(decoding[code]) for code in codes])
 
 if __name__ == '__main__':
   print(f"Input file: {filename}")
