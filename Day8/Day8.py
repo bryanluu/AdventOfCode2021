@@ -23,7 +23,9 @@ def solve(filename):
           segment_map['leftovers'] = segment_map.get('leftovers', [])
           segment_map['leftovers'].append(code)
 
-      decode_digits(segment_map)
+      decoding = decode_digits(segment_map)
+
+      print(f"{input_values}: {decoding}")
 
       for code in output_values:
         if len(code) in digit_map:
@@ -32,41 +34,33 @@ def solve(filename):
     print(f"Part 1: {count}")
 
 def decode_digits(segment_map):
-  mapping = {}
   decoding = { code: digit for digit, code in segment_map.items() if digit != 'leftovers' }
   segments = { digit: set(segment_map[digit]) for digit in segment_map.keys() }
-  # decode a
-  for a in segments[7] - segments[1]:
-    mapping[a] = 'a'
-    break
-  # decode cdef
+  # decode each digit
   for code in segment_map['leftovers']:
     if len(code) == 6:
       if not segments[1] <= set(code):
-        # code is 6
-        f = next(iter(segments[1] & set(code)))
-        mapping[f] = 'f'
-        decoding[code] = 6
-        segments[6] = code
-        c = next(iter(segments[1]))
-        mapping[c] = 'c'
-        decoding[segment_map[1]] = 1
+        digit = 6
       else:
         symm_diff = set(code) ^ segments[8]
         if symm_diff <= segments[4]:
-          # code is 9
-          digit = 9
-          character = 'd'
-        else:
-          # code is 0
           digit = 0
-          character = 'e'
-        letter = next(iter(symm_diff))
-        mapping[letter] = character
-        decoding[code] = digit
-        segments[digit] = code
+        else:
+          digit = 9
     if len(code) == 5:
-      symm_diff = set(code) ^ segments[8]
+      if segments[1] <= set(code):
+        digit = 3
+      else:
+        symm_diff = set(code) ^ segments[4]
+        if len(symm_diff) == 3:
+          digit = 5
+        else:
+          digit = 2
+    decode_digit(digit, code, decoding)
+  return decoding
+
+def decode_digit(digit, code, decoding):
+  decoding[code] = digit
 
 if __name__ == '__main__':
   print(f"Input file: {filename}")
