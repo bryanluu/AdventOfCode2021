@@ -1,12 +1,11 @@
 class Position
-  attr_reader :row, :column, :height
+  attr_reader :row, :column, :height, :neighbors
 
   def initialize(row, column, height)
     @row = row
     @column = column
     @height = height
     @neighbors = []
-    @visited = false
   end
 
   def find_neighbors(heightmap)
