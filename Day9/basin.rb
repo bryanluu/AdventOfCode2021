@@ -28,8 +28,6 @@ class Basin
     # peform a DFS on the target node, keeping track of the source node
     return if @included[key_for(target)]
     return if target.height == 9
-    return if target.height - src.height > 1
-    return if (target.height - src.height).negative?
 
     @included[key_for(target)] = true
     @size += 1
