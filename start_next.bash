@@ -129,6 +129,12 @@ else
 unfinished=`dirname */$finish`
 day=${unfinished//[!0-9]/}
 echo "Cannot start until Day $day is completed!"
+
+if [ -z "$tester" ]; then
+  tester="$unfinished/run.bash"
+  dir=$unfinished
+fi
+
 echo "Run '$tester [filename]' to test program..."
 echo "Run '$dir/finish_day.bash [-a OR --all]' in '$unfinished/' to finish first..."
 
