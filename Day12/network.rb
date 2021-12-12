@@ -27,8 +27,7 @@ class Network
         routes << path.map(&:label)
       else
         cave.neighbors.each do |neighbor|
-          visited = neighbor.small? && path.include?(neighbor)
-          queue << path + [neighbor] unless visited
+          queue << path + [neighbor] unless visited(neighbor, path)
         end
       end
     end
@@ -42,5 +41,19 @@ class Network
       output += "#{@caves[cave]}\n"
     end
     output
+  end
+
+  #######
+  private
+  #######
+
+  def visited(cave, path_so_far, extra_cave: nil)
+    return false if cave.big?
+
+    limit = cave.label == extra_cave ? 2 : 1
+
+    path_so_far.find_all do |c|
+      c.label == cave.label
+    end.count >= limit
   end
 end

@@ -17,7 +17,7 @@ class Cave
     "<#{label}: #{neighbors.map(&:label)}>"
   end
 
-  def small?
-    @small ||= (@label.downcase == @label)
+  def big?
+    @big ||= (@label.upcase == @label)
   end
 end
