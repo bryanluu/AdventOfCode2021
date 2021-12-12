@@ -11,20 +11,20 @@ class Network
       cave2 = @caves[c2]
       cave1.connect_to(cave2)
     end
-    @routes = []
   end
 
-  def explore_routes(src, dst)
+  def find_routes_for_part_one
     queue = []
+    routes = []
 
-    queue << [@caves[src]]
+    queue << [@caves['start']]
 
     until queue.empty?
       path = queue.shift
       cave = path.last
 
-      if cave.label == dst
-        @routes << path.map(&:label)
+      if cave.label == 'end'
+        routes << path.map(&:label)
       else
         cave.neighbors.each do |neighbor|
           visited = neighbor.small? && path.include?(neighbor)
@@ -32,7 +32,8 @@ class Network
         end
       end
     end
-    @routes
+
+    routes
   end
 
   def to_s
