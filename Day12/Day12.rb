@@ -10,9 +10,11 @@ def solve(filename)
   lines = File.readlines(filename).map(&:chomp)
 
   network = Network.new(lines)
-  routes_part1 = network.find_routes_for_part_one
+  routes_part1 = network.find_routes
+  routes_part2 = network.find_modified_routes
 
   puts "Part 1: #{routes_part1.length}"
+  puts "Part 2: #{routes_part2.length}"
 end
 
 if __FILE__ == $PROGRAM_NAME

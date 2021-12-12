@@ -13,7 +13,7 @@ class Network
     end
   end
 
-  def find_routes_for_part_one
+  def find_routes(extra_cave: nil)
     queue = []
     routes = []
 
@@ -27,12 +27,24 @@ class Network
         routes << path.map(&:label)
       else
         cave.neighbors.each do |neighbor|
-          queue << path + [neighbor] unless visited(neighbor, path)
+          queue << path + [neighbor] unless visited(neighbor, path, extra_cave: extra_cave)
         end
       end
     end
 
     routes
+  end
+
+  def find_modified_routes
+    routes = []
+    small_caves = caves.keys.reject do |cave|
+      @caves[cave].big? || cave == 'start' || cave == 'end'
+    end
+
+    small_caves.each do |cave|
+      routes.concat(find_routes(extra_cave: cave))
+    end
+    routes.uniq
   end
 
   def to_s
