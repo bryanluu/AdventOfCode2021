@@ -7,13 +7,12 @@ def solve(filename):
   with open(filename) as file:
     lines = file.readlines()
     template = lines[0].strip()
-    rules = parse_rules(lines[2:])
+    rules, tree = parse_rules(lines[2:])
     polymer = template
 
     print(f"Template: {template}")
-    count = {}
-    for step in range(10):
-      polymer, count = process_polymer(polymer, rules)
+    pairs = process(polymer, tree, 40)
+    count = count_characters(polymer, pairs)
     max_letter = None
     min_letter = None
     for code in count.keys():
@@ -25,26 +24,33 @@ def solve(filename):
 
 def parse_rules(lines):
   rules = {}
+  tree = {}
   for line in lines:
     pair, code = line.strip().split(' -> ')
     rules[pair] = code
-  return rules
+    tree[pair] = {pair[0] + code, code + pair[1]}
+  return rules, tree
 
-def process_polymer(polymer, rules):
-  result = []
+def process(polymer, tree, steps):
   count = dd(lambda: 0)
   for i in range(len(polymer) - 1):
     pair = polymer[i:i+2]
-    if i == 0:
-      result.append(pair[0])
-      count[pair[0]] += 1
-    if pair in rules:
-      result.append(rules[pair])
-      count[rules[pair]] += 1
-    result.append(pair[1])
-    count[pair[1]] += 1
-  new_polymer = "".join(result)
-  return new_polymer, count
+    count[pair] += 1
+  for step in range(steps):
+    next_count = dd(lambda: 0)
+    for pair in count.keys():
+      for child in tree[pair]:
+        next_count[child] += count[pair]
+    count = next_count.copy()
+  return count
+
+def count_characters(polymer, pairs):
+  count = dd(lambda: 0)
+  count[polymer[0]] = 1
+  for pair in pairs.keys():
+    code = pair[1]
+    count[code] += pairs[pair]
+  return count
 
 if __name__ == '__main__':
   print(f"Input file: {filename}")
