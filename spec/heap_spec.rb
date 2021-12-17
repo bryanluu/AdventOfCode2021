@@ -1,6 +1,6 @@
 require File.join(File.dirname(__FILE__), '..', 'Tools', 'heap')
 
-describe Heap do
+RSpec.describe Heap do
   describe '#initialize' do
     context 'by default' do
       let(:heap) { Heap.new }
@@ -35,7 +35,7 @@ describe Heap do
     end
 
     context 'when given a block' do
-      let(:heap) { Heap.new([2, 1, 0]) { |x, y| x > y } }
+      let(:heap) { Heap.new([2, 1, 0]) { |x, y| y <=> x } }
 
       it 'creates a heap with the correct size' do
         expect(heap.size).to eq(3)
@@ -97,18 +97,19 @@ describe Heap do
 
       before do
         heap.insert!(2)
+        heap.insert!(4)
       end
 
       it 'adds another element' do
-        expect(heap.size).to eq(4)
+        expect(heap.size).to eq(5)
       end
 
       it 'maintains heap property' do
-        expect(heap.data).to eq([3, 0, 1, 2])
+        expect(heap.data).to eq([4, 3, 0, 1, 2])
       end
 
       it 'updates the root correctly' do
-        expect(heap.root).to eq(3)
+        expect(heap.root).to eq(4)
       end
     end
   end
@@ -126,7 +127,7 @@ describe Heap do
       let(:heap) { Heap.new([0, 1, 2, 3]) }
 
       it 'returns nil' do
-        expect(heap.extract!).to be_nil
+        expect(heap.extract!).to eq(3)
       end
 
       it 'maintains heap property' do
