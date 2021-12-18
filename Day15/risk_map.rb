@@ -1,36 +1,40 @@
 require './risk_node'
-require 'set'
+require File.join(File.dirname(__FILE__), '..', 'Tools', 'heap')
 
 class RiskMap
   def initialize(lines)
     @nodes = {}
     @positions = []
     populate_map(lines)
-    @unvisited = Set.new(@nodes.keys)
     @shortest_path = []
   end
 
   def find_shortest_path
-    curr = @start
     prev = {}
+    min_heap = Heap.new do |node1, node2|
+      node2.distance <=> node1.distance
+    end
+    @shortest_path.clear
 
-    until curr.id == @end.id
-      curr.edges.each do |nb, edge|
-        neighbor = @nodes[nb]
+    min_heap.insert!(@start)
+    until min_heap.empty?
+      curr = min_heap.extract!
+      break if curr == @end
+
+      curr.edges.each do |id, edge|
+        neighbor = @nodes[id]
         next if neighbor.visited
 
         new_dist = curr.distance + edge
-        if neighbor.distance.nil? || new_dist < neighbor.distance
-          neighbor.distance = new_dist
-          prev[neighbor.id] = curr.id
-        end
+        next unless neighbor.distance.nil? || new_dist < neighbor.distance
+
+        neighbor.distance = new_dist
+        min_heap.insert!(neighbor)
+        prev[id] = curr.id
       end
       curr.visited = true
-      @unvisited.delete(curr.id)
-      curr = min_distance_node
     end
 
-    @shortest_path.clear
     until prev[curr.id].nil? || curr.id == @start.id
       @shortest_path.prepend(curr)
       curr = @nodes[prev[curr.id]]

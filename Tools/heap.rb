@@ -31,6 +31,10 @@ class Heap
     @data.clone
   end
 
+  def empty?
+    @data.empty?
+  end
+
   private
 
   def parent(idx)
@@ -61,7 +65,7 @@ class Heap
     r_idx = right(idx)
     value = @data[idx]
 
-    while(l_idx < @data.length)
+    while l_idx < @data.length
       nodes = { idx => @data[idx], l_idx => @data[l_idx] }
       nodes[r_idx] = @data[r_idx] unless @data[r_idx].nil?
       max_idx = nodes.keys.max { |i, j| @comparator.call(@data[i], @data[j]) }
