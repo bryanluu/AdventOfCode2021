@@ -13,9 +13,8 @@ function solve (filename) {
     const packet = convertHexToBinary(code)
     const tree = parsePacket(packet)
 
-    // printPacketTree(tree)
-
     console.log('Part 1:', sumVersions(tree))
+    console.log('Part 2:', processTree(tree))
   })
 }
 
@@ -26,14 +25,14 @@ function parsePacket (packet) {
   const leftover = packet.slice(6)
   let output = { version, packetType, value: null, children: [] }
   if (packetType === LITERAL_VALUE) {
-    output = { ...output, ...processLiteralValue(leftover) }
+    output = { ...output, ...parseLiteralValue(leftover) }
   } else {
-    output = { ...output, ...processOperator(leftover) }
+    output = { ...output, ...parseOperator(leftover) }
   }
   return output
 }
 
-function processLiteralValue (bits) {
+function parseLiteralValue (bits) {
   const END_GROUP = '0'
   let value = ''
   for (let i = 0; i < bits.length; i += 5) {
@@ -49,7 +48,7 @@ function processLiteralValue (bits) {
   }
 }
 
-function processOperator (bits) {
+function parseOperator (bits) {
   const lengthTypeId = bits[0]
   let children = []
   let leftover = ''
@@ -126,6 +125,98 @@ function sumVersions (tree) {
     })
   }
   return sum
+}
+
+function processTree (tree) {
+  if (tree.value !== null) return tree.value
+  const SUM = 0
+  const PRODUCT = 1
+  const MIN = 2
+  const MAX = 3
+  const GREATER_THAN = 5
+  const LESS_THAN = 6
+  const EQUAL = 7
+  switch (tree.packetType) {
+    case SUM:
+      processSumTree(tree)
+      break
+    case PRODUCT:
+      processProductTree(tree)
+      break
+    case MIN:
+      processMinTree(tree)
+      break
+    case MAX:
+      processMaxTree(tree)
+      break
+    case GREATER_THAN:
+      processGreaterThanTree(tree)
+      break
+    case LESS_THAN:
+      processLessThanTree(tree)
+      break
+    case EQUAL:
+      processEqualTree(tree)
+      break
+  }
+  return tree.value
+}
+
+function processSumTree (tree) {
+  let sum = 0n
+  tree.children.forEach(child => {
+    processTree(child)
+    sum += child.value
+  })
+  tree.value = sum
+}
+
+function processProductTree (tree) {
+  let prod = 1n
+  tree.children.forEach(child => {
+    processTree(child)
+    prod *= child.value
+  })
+  tree.value = prod
+}
+
+function processMinTree (tree) {
+  let min = tree.value
+  tree.children.forEach(child => {
+    processTree(child)
+    if (min === null || child.value < min) min = child.value
+  })
+  tree.value = min
+}
+
+function processMaxTree (tree) {
+  let max = tree.value
+  tree.children.forEach(child => {
+    processTree(child)
+    if (max === null || child.value > max) max = child.value
+  })
+  tree.value = max
+}
+
+function processGreaterThanTree (tree) {
+  tree.children.forEach(child => {
+    processTree(child)
+  })
+  tree.value = tree.children[0].value > tree.children[1].value ? 1n : 0n
+}
+
+function processLessThanTree (tree) {
+  tree.children.forEach(child => {
+    processTree(child)
+  })
+  tree.value = tree.children[0].value < tree.children[1].value ? 1n : 0n
+}
+
+function processEqualTree (tree) {
+  tree.children.forEach(child => {
+    processTree(child)
+  })
+  tree.value = tree.children[0].value === tree.children[1].value ? 1n : 0n
 }
 
 function printPacketTree (tree) {
