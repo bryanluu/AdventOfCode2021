@@ -1,6 +1,7 @@
 require './player'
 require './universe'
 require './dirac_dice'
+require 'pry'
 
 class QuantumGame
   BOARD = (1..10).to_a.freeze
@@ -21,20 +22,22 @@ class QuantumGame
   private
 
   def count_wins_in_universe(universe)
-    return @win_cache[universe] if @win_cache.key?(universe)
+    if universe.moving_player_score >= WIN_CONDITION || universe.idle_player_score >= WIN_CONDITION
+      win = (universe.moving_player_score >= WIN_CONDITION ? [1, 0] : [0, 1])
+      @win_cache[universe] = win
+      return win
+    end
 
     wins = [0, 0]
-    possible_rolls.each do |sums, repeats|
-      p1_sum, p2_sum = sums
-      p1 = next_move(universe.player1_position, p1_sum)
-      p2 = next_move(universe.player2_position, p2_sum)
-      new_universe = Universe.new(p1, p2, universe.player1_score + p1, universe.player2_score + p2)
-      if new_universe.player1_score >= WIN_CONDITION || new_universe.player2_score >= WIN_CONDITION
-        @win_cache[new_universe] = (new_universe.player1_score >= WIN_CONDITION ? [repeats, 0] : [0, repeats])
-      end
-      p1_wins, p2_wins = @win_cache[new_universe] || count_wins_in_universe(new_universe)
-      wins[0] += p1_wins
-      wins[1] += p2_wins
+    possible_rolls.each do |sum, repeats|
+      main_position = next_move(universe.moving_player_position, sum)
+      # switch player turn
+      new_universe = Universe.new(universe.idle_player_position, main_position,
+                                  universe.idle_player_score, universe.moving_player_score + main_position)
+      idle_wins, main_wins = @win_cache[new_universe] || count_wins_in_universe(new_universe)
+      # multiply the wins by the repeats of the sum
+      wins[0] += main_wins * repeats
+      wins[1] += idle_wins * repeats
     end
     @win_cache[universe] = wins
   end

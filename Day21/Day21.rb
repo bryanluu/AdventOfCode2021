@@ -11,7 +11,7 @@ def solve(filename)
   game1 = RegularGame.new(lines)
   puts "Part 1: #{game1.play}"
   game2 = QuantumGame.new(lines)
-  puts game2.play
+  puts "Part 2: #{game2.play.max}"
 end
 
 if __FILE__ == $PROGRAM_NAME

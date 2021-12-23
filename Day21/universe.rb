@@ -1,21 +1,22 @@
 class Universe
-  attr_reader :player1_position, :player2_position, :player1_score, :player2_score
+  attr_reader :moving_player_position, :idle_player_position, :moving_player_score, :idle_player_score
 
-  def initialize(player1_position, player2_position, player1_score, player2_score)
-    @player1_position = player1_position
-    @player2_position = player2_position
-    @player1_score = player1_score
-    @player2_score = player2_score
+  def initialize(moving_player_position, idle_player_position, moving_player_score, idle_player_score)
+    @moving_player_position = moving_player_position
+    @idle_player_position = idle_player_position
+    @moving_player_score = moving_player_score
+    @idle_player_score = idle_player_score
   end
 
   def hash
-    "#{player1_position},#{player2_position},#{player1_score},#{player2_score}".hash
+    to_a.hash
+  end
+
+  def to_a
+    [moving_player_position, idle_player_position, moving_player_score, idle_player_score]
   end
 
   def eql?(other)
-    player1_score == other.player1_score \
-      && player2_score == other.player2_score \
-      && player1_position == other.player1_position \
-      && player2_position == other.player2_position
+    to_a.eql?(other.to_a)
   end
 end
