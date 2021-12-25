@@ -63,7 +63,10 @@ class TestCuboid(unittest.TestCase):
     self.other = Cuboid(((-2, 2), (-2, 2), (-2, 2)))
     self.cuboid = Cuboid(((-3, 0), (-1, 1), (0, 3)))
     actual = self.cuboid - self.other
-    self.assertTrue(len(actual) > 0)
+    bits = [Cuboid(((-3, -3), (-1, 1), (0, 3))),
+            Cuboid(((-2, 0), (-1, 1), (3, 3)))]
+    expected = set(bits)
+    self.assertEqual(actual, expected)
     while len(actual) > 0:
       cuboid = actual.pop()
       self.assertTrue(cuboid.is_completely_outside_of(self.other))
@@ -73,7 +76,11 @@ class TestCuboid(unittest.TestCase):
     self.other = Cuboid(((-2, 2), (-2, 2), (-2, 2)))
     self.cuboid = Cuboid(((-3, 3), (-1, 1), (0, 3)))
     actual = self.cuboid - self.other
-    self.assertTrue(len(actual) > 0)
+    bits = [Cuboid(((-3, 3), (-1, 1), (3, 3))),
+            Cuboid(((-3, -3), (-1, 1), (0, 2))),
+            Cuboid(((3, 3), (-1, 1), (0, 2)))]
+    expected = set(bits)
+    self.assertEqual(actual, expected)
     while len(actual) > 0:
       cuboid = actual.pop()
       self.assertTrue(cuboid.is_completely_outside_of(self.other))
@@ -83,7 +90,11 @@ class TestCuboid(unittest.TestCase):
     self.other = Cuboid(((-2, 2), (-2, 2), (-2, 2)))
     self.cuboid = Cuboid(((-3, 0), (-3, 0), (0, 3)))
     actual = self.cuboid - self.other
-    self.assertTrue(len(actual) > 0)
+    bits = [Cuboid(((-3, -3), (-3, 0), (0, 3))),
+            Cuboid(((-2, 0), (-3, -3), (0, 3))),
+            Cuboid(((-2, 0), (-2, 0), (3, 3)))]
+    expected = set(bits)
+    self.assertEqual(actual, expected)
     while len(actual) > 0:
       cuboid = actual.pop()
       self.assertTrue(cuboid.is_completely_outside_of(self.other))
@@ -91,9 +102,16 @@ class TestCuboid(unittest.TestCase):
   def test_subtraction_when_four_faces_stick_out_along_two_axes(self):
     # four faces of cuboid sticks out along two axes
     self.other = Cuboid(((-2, 2), (-2, 2), (-2, 2)))
-    self.cuboid = Cuboid(((-3, 3), (-1, 1), (3, 3)))
+    self.cuboid = Cuboid(((-3, 3), (-1, 1), (-3, 3)))
     actual = self.cuboid - self.other
-    self.assertTrue(len(actual) > 0)
+    bits = [Cuboid(((-3, -3), (-1, 1), (-3, 3))),
+            Cuboid(((-2, 0), (-1, 1), (3, 3))),
+            Cuboid(((-2, 0), (-1, 1), (-3, -3))),
+            Cuboid(((1, 2), (-1, 1), (3, 3))),
+            Cuboid(((1, 2), (-1, 1), (-3, -3))),
+            Cuboid(((3, 3), (-1, 1), (-3, 3)))]
+    expected = set(bits)
+    self.assertEqual(actual, expected)
     while len(actual) > 0:
       cuboid = actual.pop()
       self.assertTrue(cuboid.is_completely_outside_of(self.other))
@@ -103,7 +121,12 @@ class TestCuboid(unittest.TestCase):
     self.other = Cuboid(((-2, 2), (-2, 2), (-2, 2)))
     self.cuboid = Cuboid(((-3, 3), (0, 3), (0, 3)))
     actual = self.cuboid - self.other
-    self.assertTrue(len(actual) > 0)
+    bits = [Cuboid(((-3, 3), (3, 3), (0, 3))),
+            Cuboid(((-3, 3), (0, 2), (3, 3))),
+            Cuboid(((-3, -3), (0, 2), (0, 2))),
+            Cuboid(((3, 3), (0, 2), (0, 2)))]
+    expected = set(bits)
+    self.assertEqual(actual, expected)
     while len(actual) > 0:
       cuboid = actual.pop()
       self.assertTrue(cuboid.is_completely_outside_of(self.other))
@@ -113,7 +136,15 @@ class TestCuboid(unittest.TestCase):
     self.other = Cuboid(((-2, 2), (-2, 2), (-2, 2)))
     self.cuboid = Cuboid(((-3, 3), (0, 3), (-3, 3)))
     actual = self.cuboid - self.other
-    self.assertTrue(len(actual) > 0)
+    bits = [Cuboid(((-3, 3), (3, 3), (-3, 3))),
+            Cuboid(((-3, -3), (0, 2), (-3, 3))),
+            Cuboid(((-2, 0), (0, 2), (-3, -3))),
+            Cuboid(((-2, 0), (0, 2), (3, 3))),
+            Cuboid(((1, 2), (0, 2), (-3, -3))),
+            Cuboid(((1, 2), (0, 2), (3, 3))),
+            Cuboid(((3, 3), (0, 2), (-3, 3)))]
+    expected = set(bits)
+    self.assertEqual(actual, expected)
     while len(actual) > 0:
       cuboid = actual.pop()
       self.assertTrue(cuboid.is_completely_outside_of(self.other))
@@ -123,7 +154,22 @@ class TestCuboid(unittest.TestCase):
     self.other = Cuboid(((-2, 2), (-2, 2), (-2, 2)))
     self.cuboid = Cuboid(((-3, 3), (-3, 3), (-3, 3)))
     actual = self.cuboid - self.other
-    self.assertTrue(len(actual) > 0)
+    bits = [Cuboid(((-3, -3), (-3, 3), (-3, 3))),
+            Cuboid(((-2, 0), (-3, -3), (-3, 3))),
+            Cuboid(((-2, 0), (3, 3), (-3, 3))),
+            Cuboid(((-2, 0), (-2, 0), (-3, -3))),
+            Cuboid(((-2, 0), (-2, 0), (3, 3))),
+            Cuboid(((-2, 0), (1, 2), (-3, -3))),
+            Cuboid(((-2, 0), (1, 2), (3, 3))),
+            Cuboid(((1, 2), (-3, -3), (-3, 3))),
+            Cuboid(((1, 2), (3, 3), (-3, 3))),
+            Cuboid(((1, 2), (-2, 0), (-3, -3))),
+            Cuboid(((1, 2), (-2, 0), (3, 3))),
+            Cuboid(((1, 2), (1, 2), (-3, -3))),
+            Cuboid(((1, 2), (1, 2), (3, 3))),
+            Cuboid(((3, 3), (-3, 3), (-3, 3)))]
+    expected = set(bits)
+    self.assertEqual(actual, expected)
     while len(actual) > 0:
       cuboid = actual.pop()
       self.assertTrue(cuboid.is_completely_outside_of(self.other))

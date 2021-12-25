@@ -83,7 +83,7 @@ class Cuboid:
       elif inner_axes == 1:
         return self.__handle_case_where_five_faces_stick_out(other)
       else:
-        return self.__handle_case_where_self_contrains(other)
+        return self.__handle_case_where_self_contains(other)
     return set()
 
   def bounds(self, axis = None):
@@ -262,18 +262,15 @@ class Cuboid:
 
     return outside
 
-  def __handle_case_where_self_contrains(self, other):
-    lower_inside = np.array([ (self.bounds(axis)[0] >= other.bounds(axis)[0] and \
-                                self.bounds(axis)[0] <= other.bounds(axis)[1]) for axis in range(3) ])
+  def __handle_case_where_self_contains(self, other):
     outside = set()
 
     # split cuboid along x axis
     x_axis = 0
-    low, high, = other.bounds(x_axis)
-    cut_position = (high if lower_inside[x_axis] else low)
-    bit, remaining = self.__cut_along_axis(x_axis, cut_position, flush_lower = lower_inside[x_axis])
-    outside.add(bit)
-    outside |= (remaining - other)
+    cut_position = other.midpoint(x_axis)
+    left, right = self.__cut_along_axis(x_axis, cut_position)
+    outside |= (left - other)
+    outside |= (right - other)
 
     return outside
 
