@@ -107,11 +107,45 @@ class Cuboid:
   def __eq__(self, other):
     return self.__hash__() == other.__hash__()
 
+  def combine_to_cuboids(self, other_cuboids):
+    '''Returns a set of cuboids which represent the union of self and other_cuboids'''
+    cuboids = set([self]) # working set of cuboids representing self - other_cuboids
+    processed = set() # which of other_cuboids we've already processed
+    for other in other_cuboids:
+      exclusive = set() # keep a temporary set of cuboids that we've iterated through
+      while len(cuboids) > 0:
+        cuboid = cuboids.pop()
+        if cuboid.collides_with(other):
+          exclusive.discard(cuboid)
+          cuboid_exclusive = (cuboid - other)
+          cuboids |= cuboid_exclusive
+        else:
+          exclusive.add(cuboid)
+      cuboids = exclusive
+      processed.add(other)
+    other_cuboids |= cuboids
+    other_cuboids |= processed
+    return cuboids
+
+  def remove_colliding_cuboids(self, other_cuboids):
+    '''Updates the set of other_cuboids to be the set representing other_cuboids - self'''
+    processed = set()
+    while len(other_cuboids) > 0:
+      other_cuboid = other_cuboids.pop()
+      if self.collides_with(other_cuboid):
+        processed |= (other_cuboid - self)
+      else:
+        processed.add(other_cuboid)
+    other_cuboids |= processed
+    return other_cuboids
+
   def __cut_along_axis(self, axis, cut_position, flush_lower = True):
     '''Returns this split along the given axis at the cut_position'''
     lower_bounds = self.bounds()
     higher_bounds = self.bounds()
     low, high = self.bounds(axis)
+    if not low <= cut_position <= high:
+      return None, None
     if not flush_lower:
       cut_position -= 1
     lower_bounds[axis] = (low, cut_position)

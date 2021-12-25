@@ -28,51 +28,12 @@ def parse_range(range_str):
   return low, high
 
 def reboot_cubes(on_cuboids, cuboid, power_on):
-  pdb.set_trace()
   if power_on:
-    leftover = calculate_excluded_cubes(cuboid, on_cuboids)
-    on_cuboids |= leftover
+    on_cuboids |= cuboid.combine_to_cuboids(on_cuboids)
   else:
-    turn_off_colliding_cuboids(cuboid, on_cuboids)
-
-def turn_off_colliding_cuboids(cuboid, other_cuboids):
-  processed = set()
-  while len(other_cuboids) > 0:
-    other_cuboid = other_cuboids.pop()
-    if cuboid.collides_with(other_cuboid):
-      other_cuboids |= (other_cuboid - cuboid)
-    else:
-      processed.add(cuboid)
-  other_cuboids |= processed
-
-def calculate_excluded_cubes(cuboid, other_cuboids):
-  cuboids = set([cuboid])
-  processed = set()
-  while len(other_cuboids) > 0:
-    other_cuboid = other_cuboids.pop()
-    exclusive = set()
-    broke = False
-    while len(cuboids) > 0:
-      cuboid = cuboids.pop()
-      if cuboid.collides_with(other_cuboid):
-        exclusive.discard(cuboid)
-        cuboid_exclusive = (cuboid - other_cuboid)
-        other_cuboid_exclusive = (other_cuboid - cuboid)
-        processed.discard(other_cuboid_exclusive)
-        cuboids |= cuboid_exclusive
-        processed |= other_cuboid_exclusive
-        broke = True
-      else:
-        exclusive.add(cuboid)
-    cuboids = exclusive
-    if not broke:
-      processed.add(other_cuboid)
-  other_cuboids |= processed
-
-  return cuboids
+    cuboid.remove_colliding_cuboids(on_cuboids)
 
 def count_cubes_that_are_on(on_cuboids):
-  print(on_cuboids)
   return sum(cuboid.cubes() for cuboid in on_cuboids)
 
 if __name__ == '__main__':
