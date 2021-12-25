@@ -1,6 +1,7 @@
 #!/bin/python3
 import sys
-import numpy as np
+from cuboid import Cuboid
+import pdb
 
 filename = sys.argv[1] if len(sys.argv) > 1 else "input.txt"
 
@@ -9,16 +10,16 @@ INITIALIZATION_REGION_SIZE = 101
 def solve(filename):
   with open(filename) as file:
     lines = file.readlines()
-    cubes = np.zeros(shape=[101, 101, 101], dtype=bool)
+    on_cuboids = set()
     for line in lines:
       cuboid, power_on = parse_cuboid(line)
-      reboot_cubes(cubes, cuboid, power_on)
-    print(f"Part 1: {cubes[0:101, 0:101, 0:101].sum()}")
+      reboot_cubes(on_cuboids, cuboid, power_on)
+    print(f"Cubes: {count_cubes_that_are_on(on_cuboids)}")
 
 def parse_cuboid(line):
   power_on = line.startswith('on')
   range_strings = line.strip('onf').split(',')
-  cuboid = [parse_range(range_str) for range_str in range_strings]
+  cuboid = Cuboid(tuple(parse_range(range_str) for range_str in range_strings))
   return cuboid, power_on
 
 def parse_range(range_str):
@@ -26,18 +27,53 @@ def parse_range(range_str):
   low, high = map(int, coord_str.split('..'))
   return low, high
 
-def reboot_cubes(cubes, cuboid, power_on):
-  (low_x, high_x), (low_y, high_y), (low_z, high_z) = translated_coordinates(cubes, cuboid)
-  cubes[low_x:high_x, low_y:high_y, low_z:high_z] = power_on
+def reboot_cubes(on_cuboids, cuboid, power_on):
+  pdb.set_trace()
+  if power_on:
+    leftover = calculate_excluded_cubes(cuboid, on_cuboids)
+    on_cuboids |= leftover
+  else:
+    turn_off_colliding_cuboids(cuboid, on_cuboids)
 
-def translated_coordinates(cubes, cuboid):
-  (low_x, high_x), (low_y, high_y), (low_z, high_z) = cuboid
-  width, height, depth = cubes.shape
-  x_offset, y_offset, z_offset = width//2, height//2, depth//2
-  return (low_x + x_offset, high_x + x_offset + 1), (low_y + y_offset, high_y + y_offset + 1), (low_z + z_offset, high_z + z_offset + 1)
+def turn_off_colliding_cuboids(cuboid, other_cuboids):
+  processed = set()
+  while len(other_cuboids) > 0:
+    other_cuboid = other_cuboids.pop()
+    if cuboid.collides_with(other_cuboid):
+      other_cuboids |= (other_cuboid - cuboid)
+    else:
+      processed.add(cuboid)
+  other_cuboids |= processed
 
-def cubes(cubes, cuboid):
-  pass
+def calculate_excluded_cubes(cuboid, other_cuboids):
+  cuboids = set([cuboid])
+  processed = set()
+  while len(other_cuboids) > 0:
+    other_cuboid = other_cuboids.pop()
+    exclusive = set()
+    broke = False
+    while len(cuboids) > 0:
+      cuboid = cuboids.pop()
+      if cuboid.collides_with(other_cuboid):
+        exclusive.discard(cuboid)
+        cuboid_exclusive = (cuboid - other_cuboid)
+        other_cuboid_exclusive = (other_cuboid - cuboid)
+        processed.discard(other_cuboid_exclusive)
+        cuboids |= cuboid_exclusive
+        processed |= other_cuboid_exclusive
+        broke = True
+      else:
+        exclusive.add(cuboid)
+    cuboids = exclusive
+    if not broke:
+      processed.add(other_cuboid)
+  other_cuboids |= processed
+
+  return cuboids
+
+def count_cubes_that_are_on(on_cuboids):
+  print(on_cuboids)
+  return sum(cuboid.cubes() for cuboid in on_cuboids)
 
 if __name__ == '__main__':
   print(f"Input file: {filename}")
